@@ -7,22 +7,14 @@ public with sharing class TerritoryAssignment {
         list<opportunity> OppUpdateList = new list<opportunity>();
         List<sObject> UpdateList = new List<sObject>();
         //create map of ZipCode and OwnerId 
-        map<string,string> mapZipCodetoOwnerid = new map<string,string>();
-        for(Territory__c t: [select Id,Zip_Code__c,ownerId from Territory__c]){
-                if(!mapZipCodetoOwnerid.isEmpty()){
-                    if(!mapZipCodetoOwnerid.containsKey(t.Zip_Code__c)){
-                        mapZipCodetoOwnerid.put(t.Zip_Code__c,t.ownerId);
-                    }
-                }else{
-                    mapZipCodetoOwnerid.put(t.Zip_Code__c,t.ownerId);
-                }
-        }
-        System.debug('mapZipCodetoOwnerid'+mapZipCodetoOwnerid);
+        map<string,List<string>> mapZipCodetoOwnerid = getTerritories();
+         System.debug('mapZipCodetoOwnerid'+mapZipCodetoOwnerid);
         for(account a: accList){
                accId.add(a.Id); 
         }
         for(Account acc:[select id,ownerId,BillingPostalCode, (select id,OwnerId from contacts),(select id,OwnerId from Opportunities) from Account where Id in:accId]){
-                string oId =  mapZipCodetoOwnerid.get(acc.BillingPostalCode);
+                string oId =  getRandomOwner(mapZipCodetoOwnerid,acc.BillingPostalCode);
+                if(oId!='' && oId!=null){
                 acc.ownerId = oId;
                 UpdateList.add(acc);
 
@@ -47,7 +39,39 @@ public with sharing class TerritoryAssignment {
         If(UpdateList!=null && !UpdateList.isEmpty()){
             update UpdateList;
         }
+        }
 
 
     }
+
+    private static map<string, List<String>> getTerritories(){
+        map<string, List<String>> returnList  = new map<string, List<String>>();
+        for(Territory__c t: [select Id,Zip_Code__c,ownerId from Territory__c]){
+            if(!returnList.isEmpty()){
+                if(!returnList.containsKey(t.Zip_Code__c)){
+                    returnList.put(t.Zip_Code__c,new List<string>{t.ownerId});
+                }else{
+                    returnList.get(t.Zip_Code__c).add(t.ownerId);
+                }
+            }else{
+                returnList.put(t.Zip_Code__c,new List<string>{t.ownerId});
+            }
+    }
+    if(!returnList.isEmpty())
+    {
+        return returnList;
+    }else return null;
+    }
+
+   private static string getRandomOwner(map<string,List<string>> mapZipCodetoOwnerid,string zipCode)
+   { 
+    List<String> owners = new List<string>();
+       if(mapZipCodetoOwnerid.containsKey(zipcode)){
+        owners= mapZipCodetoOwnerid.get(zipCode);
+    }else {return null;}
+        Double randomNumber = Math.random(); 
+        Integer arrayLength = owners.size(); 
+        Integer randomIndex = (randomNumber *(arrayLength-1)).intValue(); 
+        return owners[randomIndex];
+   } 
 }
