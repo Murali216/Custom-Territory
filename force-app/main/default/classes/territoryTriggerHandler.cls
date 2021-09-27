@@ -9,7 +9,9 @@ public with sharing class territoryTriggerHandler {
                 tList.add(t.Zip_Code__c);
                 trigList.add(t);
             }
+            If(!trigList.isEmpty()){
             TerritoryValidations.redundantZipCodes(tList,trigList);
+            }
         }
         
     }
@@ -24,9 +26,21 @@ public with sharing class territoryTriggerHandler {
                 trigList.add(t);
             }
         }
-
+        If(!trigList.isEmpty()){
         TerritoryValidations.redundantZipCodes(tList,trigList);
+        }
     }
 
-
+    public static void afterUpdateHandler(list<territory__c> newList, map<id,territory__c> newMap, list<territory__c> oldList, map<id,territory__c> oldMap){
+        List<Territory__c> trigList =  new List<territory__c>();
+        for(Territory__c t:newList){
+        if(t.OwnerId!= oldMap.get(t.Id).OwnerId){
+            trigList.add(t);
+    }
+    }
+    System.debug('After Update Handler'+trigList);
+    If(!trigList.isEmpty()){
+    id jobID = system.EnqueueJob(new UpdateOwnersQueueable(trigList));
+}
+}
 }

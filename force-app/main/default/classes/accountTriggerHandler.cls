@@ -6,7 +6,9 @@ public with sharing class accountTriggerHandler {
                 accPostalCodeChanged.add(a);
             }
         }
+        If(accPostalCodeChanged!=null && !accPostalCodeChanged.isEmpty()){
         TerritoryAssignment.AssignNewOwner(accPostalCodeChanged,null);
+    }
    
     }
 
@@ -17,7 +19,9 @@ public with sharing class accountTriggerHandler {
                 accPostalCodeUpdated.add(a);
             }
         }
+        If(accPostalCodeUpdated!=null && !accPostalCodeUpdated.isEmpty()){
         TerritoryAssignment.AssignNewOwner(accPostalCodeUpdated,oldMap);
+        }
 
 
     } 

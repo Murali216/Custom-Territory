@@ -26,7 +26,7 @@ public with sharing class TerritoryAssignment {
 
 
                 //Create Assignment History records
-                 Assignment_History__C  aHistory =  new Assignment_History__C();
+                 Assignment_History__c  aHistory =  new Assignment_History__C();
                  If(oldMap!=null){
                  aHistory.Previous_Owner__c = PreviousOwner;
                  aHistory.Previous_Territory__c =  PreviousTerritory;
