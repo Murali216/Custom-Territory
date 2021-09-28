@@ -7,6 +7,12 @@ public class UpdateOwnersQueueable implements Queueable {
         List<account> UpdateList = new List<Account>();
         List<Assignment_History__C> insertList = new List<Assignment_History__C>();
         map<String, Territory__c> mapZipCodetoTerritory  = new map<string,Territory__c>();
+
+        //Attach transaction Finalizer
+        AssignmentHistoryFinalizer f =  new AssignmentHistoryFinalizer();
+        system.attachFinalizer(f);
+
+
         for(Territory__c t: ters){
             if(!mapZipCodetoTerritory.isEmpty()){
                 if(!mapZipCodetoTerritory.containsKey(t.Zip_Code__c)){
@@ -31,13 +37,13 @@ public class UpdateOwnersQueueable implements Queueable {
              aHistory.new_Owner__c = mapZipCodetoTerritory.get(acc.BillingPostalCode).OwnerId;
              aHistory.Changed_By__c =UserInfo.getUserId();
              aHistory.Account__c = acc.Id;
-             insertList.add(aHistory);
+             f.createInsertList(aHistory);
           }
           If(UpdateList!=null && !UpdateList.isEmpty()){
             update UpdateList;
         }
-            If(insertList!=null && !insertList.isEmpty()){
-            insert insertList;
-        }
+        //     If(insertList!=null && !insertList.isEmpty()){
+        //     insert insertList;
+        // }
     }
 }
