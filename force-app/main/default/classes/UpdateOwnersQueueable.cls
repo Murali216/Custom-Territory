@@ -5,7 +5,7 @@ public class UpdateOwnersQueueable implements Queueable {
     }
     public void execute(System.QueueableContext context){
         List<account> UpdateList = new List<Account>();
-        List<Assignment_History__C> InserList = new List<Assignment_History__C>();
+        List<Assignment_History__C> insertList = new List<Assignment_History__C>();
         map<String, Territory__c> mapZipCodetoTerritory  = new map<string,Territory__c>();
         for(Territory__c t: ters){
             if(!mapZipCodetoTerritory.isEmpty()){
@@ -31,9 +31,13 @@ public class UpdateOwnersQueueable implements Queueable {
              aHistory.new_Owner__c = mapZipCodetoTerritory.get(acc.BillingPostalCode).OwnerId;
              aHistory.Changed_By__c =UserInfo.getUserId();
              aHistory.Account__c = acc.Id;
-            InserList.add(aHistory);
+             insertList.add(aHistory);
           }
-          update UpdateList;
-          insert  InserList;
+          If(UpdateList!=null && !UpdateList.isEmpty()){
+            update UpdateList;
+        }
+            If(insertList!=null && !insertList.isEmpty()){
+            insert insertList;
+        }
     }
 }

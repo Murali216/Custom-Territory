@@ -36,7 +36,7 @@ public with sharing class TerritoryAssignment {
                 aHistory.Changed_By__c =UserInfo.getUserId() ;
                 aHistory.Account__c = acc.Id;
                 insertList.add(aHistory);
-                insert insertList; 
+             
                 // End Assignment History Records
 
 
@@ -58,9 +58,13 @@ public with sharing class TerritoryAssignment {
         // update conUpdateList;
         // If(OppUpdateList!=null && !OppUpdateList.isEmpty())
         // update OppUpdateList;
+
+        }
         If(UpdateList!=null && !UpdateList.isEmpty()){
             update UpdateList;
         }
+        If(insertList!=null && !insertList.isEmpty()){
+            insert insertList;
         }
 
 
